@@ -49,3 +49,16 @@ body
 .horizontal-movement-btns div:active {
     background-color: rgba(255, 255, 255, 0.897);
 } 
+
+.loading {
+    position: absolute;
+    margin: auto;
+    top: 0;right: 0;left: 0;bottom: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

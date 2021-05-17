@@ -34,7 +34,12 @@ gltfLoader.load("./models/car.gltf", gltf => {
         carParts[i].children[0].receiveShadow = false;
     }
     scene.add(car);
-});
+    document.querySelector(".loading").style.display = "none";
+},  snap => {
+        const loadedPercent = snap.loaded/snap.total * 100;
+        document.querySelector(".loading-percent").innerHTML = Math.floor(loadedPercent);        
+    }
+);
 
 const floor = new THREE.Mesh(
     new THREE.PlaneBufferGeometry( 500, 500 ),
