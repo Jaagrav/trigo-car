@@ -3,9 +3,6 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
-import gsap from 'gsap'
-import { MathUtils } from 'three';
-
 /**
  * Game Variables
  */
@@ -18,19 +15,36 @@ let car, speed = 0, rotationSpeed = 0, keysDown = [];
 const canvas = document.querySelector('canvas.webgl')
 
 // Scene
-const scene = new THREE.Scene()
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xb2f8ec, 1, 100);
 
 /**
- * Object
+ * Objects
  */
 const gltfLoader = new GLTFLoader();
 gltfLoader.load("./models/car.gltf", gltf => {
     car = gltf.scene;
-    car.scale.set(0.4, 0.4, 0.4);
+    car.scale.set(0.7, 0.7, 0.7);
     car.position.y = -2;
+    car.castShadow = true; 
+    car.receiveShadow = false;
+    const carParts = car.children[0].children[0].children[0].children[0].children[0].children;
+    for(let i in carParts) {
+        carParts[i].children[0].castShadow = true; 
+        carParts[i].children[0].receiveShadow = false;
+    }
     scene.add(car);
-    console.log(car);
 });
+
+const floor = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry( 500, 500 ),
+    new THREE.MeshBasicMaterial( {color: 0x5cc75e, } )
+);
+floor.rotation.x = -Math.PI * 0.5;
+floor.position.y = -2;
+floor.receiveShadow = true;
+
+scene.add(floor);
 
 /**
  * Sizes
@@ -89,12 +103,14 @@ window.addEventListener('dblclick', () =>
 /**
  * Lights
  */
-const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1),
-    directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight1.position.set(6, 6, 0);
-directionalLight2.position.set(-6, -6, 0);
+const directionalLight1 = new THREE.DirectionalLight(0xffffff, 4, 100);
+directionalLight1.castShadow = true;
+directionalLight1.position.set(3, 5, 0);
 
-scene.add(directionalLight1, directionalLight2, new THREE.AmbientLight(0xffffff, 5));
+scene.add(
+    directionalLight1, 
+    new THREE.AmbientLight(0xffffff, 4)
+);
 
 /**
  * Camera
@@ -108,7 +124,7 @@ scene.add(camera)
 // Controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
-controls.enabled = false
+// controls.enabled = false
 
 /**
  * Renderer
@@ -116,9 +132,13 @@ controls.enabled = false
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
+
+renderer.shadowMap.enabled = true;
+// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.setClearColor(0xabffb0);
+renderer.setClearColor(0xb2f8ec);
 
 /**
  * Animate
@@ -156,14 +176,13 @@ const moveCoordinates = () => {
 }
 
 const isMovingForward = () => {
-    if(speed > 0) return 1;
-    else if(speed < 0) return -1;
+    if(speed > 0 || speed < 0) return speed/0.7;
     else return 0;
 }
 
 function moveCar() {
     if(car){
-        car.rotation.y += 0.05 * rotationSpeed * isMovingForward();
+        car.rotation.y += (0.05 * rotationSpeed) * isMovingForward();
         car.position.x += moveCoordinates().x * speed;
         car.position.z += moveCoordinates().z * speed;
         if(car.rotation.y > Math.PI * 2) car.rotation.y = 0;
@@ -173,10 +192,10 @@ function moveCar() {
         carParts.children[0].children[0].rotation.x = 
         carParts.children[1].children[0].rotation.x = 
         carParts.children[2].children[0].rotation.x = 
-        carParts.children[3].children[0].rotation.x += 0.1 * (speed/0.3);
+        carParts.children[3].children[0].rotation.x += 0.2 * (speed/0.7);
 
         carParts.children[2].rotation.y = 
-        carParts.children[3].rotation.y = rotationSpeed * Math.PI / 8;
+        carParts.children[3].rotation.y = rotationSpeed * Math.PI / 10;
     }
     if(speed > 0.00) speed -= 0.005;
     if(speed < 0.00) speed += 0.005;
@@ -186,17 +205,17 @@ function moveCar() {
     if(rotationSpeed <= 0.00) rotationSpeed += 0.05;
     if(Math.abs(rotationSpeed) < 0.05) rotationSpeed = 0;
 
-    if(keysDown.includes("ArrowLeft")) {
+    if(keysDown.includes("ArrowLeft") || keysDown.includes("a")) {
         rotationSpeed += (rotationSpeed < 1) ? 0.1 : 0;
     }
-    if(keysDown.includes("ArrowRight")) {
+    if(keysDown.includes("ArrowRight") || keysDown.includes("d")) {
         rotationSpeed -= (rotationSpeed > -1) ? 0.1 : 0;
     }
-    if(keysDown.includes("ArrowUp")) {
-        speed += (speed < 0.3) ? 0.02 : 0;
+    if(keysDown.includes("ArrowUp") || keysDown.includes("w")) {
+        speed += (speed < 0.7) ? 0.02 : 0;
     }
-    if(keysDown.includes("ArrowDown")) {
-        speed -= (speed > -0.3) ? 0.02 : 0;
+    if(keysDown.includes("ArrowDown") || keysDown.includes("s")) {
+        speed -= (speed > -0.7) ? 0.02 : 0;
     }
 }
 
