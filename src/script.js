@@ -124,7 +124,7 @@ scene.add(camera)
 // Controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
-// controls.enabled = false
+controls.enabled = false
 
 /**
  * Renderer
@@ -218,6 +218,42 @@ function moveCar() {
         speed -= (speed > -0.7) ? 0.02 : 0;
     }
 }
+
+const arrowUpOSBtn = document.querySelector('.arrow-up'),
+    arrowDownOSBtn = document.querySelector('.arrow-down'),
+    arrowLeftOSBtn = document.querySelector('.arrow-left'),
+    arrowRightOSBtn = document.querySelector('.arrow-right');
+
+const moveCarWithOSBtns = (e) => {
+    const key = e.target.getAttribute('move');
+    if(e.type === 'touchstart' || e.type === 'mousedown') {
+        if(!keysDown.includes(key))
+            keysDown.push(key);
+    }
+    if(e.type === 'touchend' || e.type === 'mouseup') {
+        keysDown.splice(keysDown.indexOf(key), 1);
+    }
+}
+
+arrowUpOSBtn.addEventListener('mousedown', moveCarWithOSBtns);
+arrowDownOSBtn.addEventListener('mousedown', moveCarWithOSBtns);
+arrowLeftOSBtn.addEventListener('mousedown', moveCarWithOSBtns);
+arrowRightOSBtn.addEventListener('mousedown', moveCarWithOSBtns);
+
+arrowUpOSBtn.addEventListener('mouseup', moveCarWithOSBtns);
+arrowDownOSBtn.addEventListener('mouseup', moveCarWithOSBtns);
+arrowLeftOSBtn.addEventListener('mouseup', moveCarWithOSBtns);
+arrowRightOSBtn.addEventListener('mouseup', moveCarWithOSBtns);
+
+arrowUpOSBtn.addEventListener('touchstart', moveCarWithOSBtns);
+arrowDownOSBtn.addEventListener('touchstart', moveCarWithOSBtns);
+arrowLeftOSBtn.addEventListener('touchstart', moveCarWithOSBtns);
+arrowRightOSBtn.addEventListener('touchstart', moveCarWithOSBtns);
+
+arrowUpOSBtn.addEventListener('touchend', moveCarWithOSBtns);
+arrowDownOSBtn.addEventListener('touchend', moveCarWithOSBtns);
+arrowLeftOSBtn.addEventListener('touchend', moveCarWithOSBtns);
+arrowRightOSBtn.addEventListener('touchend', moveCarWithOSBtns);
 
 window.addEventListener('keydown', (e) => {
     if(!keysDown.includes(e.key))
